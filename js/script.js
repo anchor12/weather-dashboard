@@ -2,6 +2,17 @@ $(document).ready(function () {
 
     var apikey = "c87501e8b4c8cfd8b54fbd772545c8d3";
     var searchedCity;
+    var savedSearches;
+    console.log("Saved Searches local storage: " + localStorage.getItem("savedSearches"))
+    if (localStorage.getItem("savedSearches") === null) {
+        savedSearches = [];
+        console.log("New empty savedSearches created!")
+    }
+    else {
+        savedSearches = JSON.parse(localStorage.getItem("savedSearches"))
+        console.log("got savedSearches from storage");
+    }
+
 
     function getDateFunction(daysPast) {
         var today = new Date();
@@ -17,13 +28,44 @@ $(document).ready(function () {
     $("#search-button").on("click", function () {
 
         var cityId;
-        var savedButton = $("<button>");
-        savedButton.text($("#search-bar").val());
-        savedButton.addClass("btn btn-outline-secondary");
-        savedButton.css("margin-bottom", "5px");
-        $(".search-term-box").append(savedButton);
-        $(".search-term-box").append($("<br>"));
+        var savedSearchesString;
         searchedCity = $("#search-bar").val();
+        console.log("searchedCity: " + searchedCity + " and " + savedSearches.length)
+        var dupe = 0;
+
+
+        for (var j = 0; j < savedSearches.length ; j++) { //run this loop even if no previous saved searches
+
+            if (searchedCity === savedSearches[j]) {
+                
+
+               dupe++;
+
+
+
+            }
+        }
+
+        if (dupe===0) {
+
+            savedSearches.push(searchedCity); //push city name into array of cities 
+            var savedButton = $("<button>"); //create saved city button
+            savedButton.text(searchedCity);
+            savedButton.addClass("btn btn-outline-secondary");
+            savedButton.css("margin-bottom", "5px");
+            $("#search-term-box").append(savedButton);
+            $("#search-term-box").append($("<br>"));
+            savedSearchesString = JSON.stringify(savedSearches)
+            localStorage.setItem("savedSearches", savedSearchesString);
+            
+
+
+
+        }
+
+
+
+        //savedSearches.push(searchedCity);
         var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + searchedCity + "&appid=" + apikey;
         var iconCode;
         var iconCodeForecast;
