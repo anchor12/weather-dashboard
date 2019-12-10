@@ -11,6 +11,16 @@ $(document).ready(function () {
     else {
         savedSearches = JSON.parse(localStorage.getItem("savedSearches"))
         console.log("got savedSearches from storage");
+
+        for (var k = 0; k < savedSearches.length; k++) { //goes through local storage item
+            var savedButton = $("<button>"); //create saved city button
+            savedButton.text(savedSearches[k]);
+            savedButton.addClass("btn btn-outline-secondary");
+            savedButton.addClass("savedBtn");
+            savedButton.css("margin-bottom", "5px");
+            $("#search-term-box").append(savedButton);
+            $("#search-term-box").append($("<br>"));
+        };
     }
 
 
@@ -19,73 +29,62 @@ $(document).ready(function () {
         var dd = String(today.getDate() + daysPast).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         var yyyy = today.getFullYear();
-
         today = mm + '/' + dd + '/' + yyyy;
         return today;
     }
 
 
     $("#search-button").on("click", function () {
+        searchForCity($("#search-bar").val());
+    }); //end of search
 
+    $(".savedBtn").on("click", function () {    
+        searchForCity($(this).text());
+    });
+
+
+    function searchForCity(searchedCity) {
         var cityId;
         var savedSearchesString;
-        searchedCity = $("#search-bar").val();
         console.log("searchedCity: " + searchedCity + " and " + savedSearches.length)
         var dupe = 0;
-
-
-        for (var j = 0; j < savedSearches.length ; j++) { //run this loop even if no previous saved searches
-
-            if (searchedCity === savedSearches[j]) {
-                
-
-               dupe++;
-
-
-
+        for (var j = 0; j < savedSearches.length; j++) {
+            if (searchedCity.toLowerCase().trim() === savedSearches[j].toLowerCase().trim()) {
+                dupe++;
             }
         }
 
-        if (dupe===0) {
-
+        if (dupe === 0) {
             savedSearches.push(searchedCity); //push city name into array of cities 
             var savedButton = $("<button>"); //create saved city button
             savedButton.text(searchedCity);
             savedButton.addClass("btn btn-outline-secondary");
+            savedButton.addClass("savedBtn");
             savedButton.css("margin-bottom", "5px");
+            savedButton.on("click", function () {
+                searchForCity($(this).text());
+            });
             $("#search-term-box").append(savedButton);
             $("#search-term-box").append($("<br>"));
             savedSearchesString = JSON.stringify(savedSearches)
             localStorage.setItem("savedSearches", savedSearchesString);
-            
-
-
-
         }
 
-
-
-        //savedSearches.push(searchedCity);
         var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + searchedCity + "&appid=" + apikey;
         var iconCode;
         var iconCodeForecast;
         var iconCodeForecastUrl;
         var iconUrl;
 
-
         $.ajax({
             url: queryURL,
-            method: "GET",
-
+            method: "GET"
         })
             // We store all of the retrieved data inside of an object called "response"
             .then(function (response) {
                 iconCode = response.weather[0].icon;
                 cityId = response.id;
                 iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
-
-                // Transfer content to HTML
-
                 $(".city-name").html("<h2>" + response.name + " (" + getDateFunction(0) + ")</h2>");
                 $(".city-name").append($("<img>").attr("src", iconUrl));
                 $(".city-temp").text("Temperature (F) " + response.main.temp);
@@ -93,39 +92,33 @@ $(document).ready(function () {
                 $(".city-wind").text("Wind Speed: " + response.wind.speed);
                 getForecast(cityId); //run next AJAX call to get the 5day forecast
             });
+    };
 
 
+    function getForecast(cityId) {
 
-        function getForecast(cityId) {
-            forecastQueryURL = "https://api.openweathermap.org/data/2.5/forecast?id=" + cityId + "&appid=" + apikey;
-            console.log("Hey: " + forecastQueryURL)
-            $.ajax({
-                url: forecastQueryURL,
-                method: "GET"
-            }).then(function (response) {
+        forecastQueryURL = "https://api.openweathermap.org/data/2.5/forecast?id=" + cityId + "&appid=" + apikey;
+        console.log("Hey: " + forecastQueryURL)
+        $.ajax({
+            url: forecastQueryURL,
+            method: "GET"
+        }).then(function (response) {
+            $(".forecast-day").text("");
 
+            for (var i = 0; i < 5; i++) {
 
-                for (var i = 0; i < 5; i++) {
-
-                    iconCodeForecast = response.list[i].weather[0].icon;
-
-                    iconCodeForecastUrl = "http://openweathermap.org/img/w/" + iconCodeForecast + ".png";
-                    var forecastDayCard = $(".forecast-day[data-id='" + (i + 1) + "']");
-                    forecastDayCard.append($("<h5>").text(getDateFunction(i + 1)));
-                    forecastDayCard.css("margin", "10px");
-                    forecastDayCard.css("background-color", "rgb(5, 149, 206)");
-                    forecastDayCard.append($("<img>").attr("src", iconCodeForecastUrl));
-                    forecastDayCard.append($("<p>").text("Temp: " + response.list[i].main.temp + "F"));
-                    forecastDayCard.append($("<p>").text("Humidity: " + response.list[i].main.humidity + "%"));
-                };
-
-
-            });
-        };
+                iconCodeForecast = response.list[i].weather[0].icon;
+                iconCodeForecastUrl = "http://openweathermap.org/img/w/" + iconCodeForecast + ".png";
+                var forecastDayCard = $(".forecast-day[data-id='" + (i + 1) + "']");
+                forecastDayCard.append($("<h5>").text(getDateFunction(i + 1)));
+                forecastDayCard.css("margin", "10px");
+                forecastDayCard.css("background-color", "rgb(5, 149, 206)");
+                forecastDayCard.append($("<img>").attr("src", iconCodeForecastUrl));
+                forecastDayCard.append($("<p>").text("Temp: " + response.list[i].main.temp + "F"));
+                forecastDayCard.append($("<p>").text("Humidity: " + response.list[i].main.humidity + "%"));
+            };
 
 
-    });
-
-
-
+        });
+    };
 });
