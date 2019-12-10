@@ -11,32 +11,50 @@
     </div>
 </head>
 
-<body >
+<body>
     <div style="display:flex; flex-direction:row">
-    <div class="card" style="width:35%; margin-top: 20px; margin-left: 10px; height: 75vh">
-        <div class="card-body search-term-box">
-            <div class="sidebar-search">
-                <h3>Search for a City:</h3>
+        <div class="card" style="width:35%; margin-top: 20px; margin-left: 10px; height: 75vh">
+            <div class="card-body search-term-box">
+                <div class="sidebar-search">
+                    <h3>Search for a City:</h3>
+                </div>
+                <div class="input-group mb-3" style="width:95%">
+                    <input type="text" class="form-control" id="search-bar" placeholder="City Name"
+                        aria-label="City Name" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" id="search-button" type="button">Search</button>
+                    </div>
+                </div>
+
             </div>
-            <div class="input-group mb-3" style="width:95%">
-                <input type="text" class="form-control" id="search-bar" placeholder="City Name" aria-label="City Name"
-                    aria-describedby="basic-addon2">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" id="search-button" type="button">Search</button>
+        </div>
+        <div class="container" style="display:flex; flex-direction:column">
+            <div class="card" style="width:100%; margin-top: 20px; margin-left: 10px; height: 40vh">
+                <div class="card-body">
+                    <div class="city-w-icon" style="display:inline-block">
+                        <h1 class="city-name"></h1>
+                    </div>
+                    <p class="city-temp"></p>
+                    <p class="city-humidity"></p>
+                    <p class="city-wind"></p>
+                    <p class="city-uv"></p>
                 </div>
             </div>
+            <div class="card" id="forecast-container" style="width:100%; margin-top: 20px; margin-left: 10px; height: 40vh">
+                    <h3 class="forecast-header" style = "padding: 5px">5 Day Forecast</h3>
+                <div class="card-body" id="forecasts" style="display:flex; flex-direction: row; color: white">
+                    
 
+                    <div class="forecast-day card-body" data-id="1"></div>
+                    <div class="forecast-day card-body" data-id="2"></div>
+                    <div class="forecast-day card-body" data-id="3"></div>
+                    <div class="forecast-day card-body" data-id="4"></div>
+                    <div class="forecast-day card-body" data-id="5"></div>
+                    
+
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="card"  style="width:60%; margin-top: 20px; margin-left: 10px; height: 40vh">
-        <div class="card-body">
-            <h1 class="city-name"></h1>
-            <p class="city-temp"></p>
-            <p class="city-humidity"></p>
-            <p class="city-wind"></p>
-            <p class="city-uv"></p>
-        </div>
-    </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="./js/script.js"></script>
